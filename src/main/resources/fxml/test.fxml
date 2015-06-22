@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<AnchorPane fx:id="anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aim.test.Controller">
+   <children>
+      <TabPane fx:id="tabPane" layoutX="6.0" layoutY="6.0" prefHeight="768.0" prefWidth="1366.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab fx:id="videoTab" text="Відео">
+               <content>
+                  <StackPane fx:id="stackPane" prefHeight="730.0" prefWidth="1400.0">
+                     <children>
+                        <Pane fx:id="videoPane" prefHeight="720.0" prefWidth="1360.0">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Pane>
+                        <Pane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="upButton" layoutX="1132.0" layoutY="500.0" mnemonicParsing="false" onAction="#moveToUp" onMouseClicked="#stepToUp" onMousePressed="#moveToUp" onMouseReleased="#stopMove" prefHeight="44.0" prefWidth="44.0" text="U" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Saab" size="15.0" />
+                                 </font>
+                              </Button>
+                              <Button layoutX="1132.0" layoutY="546.0" mnemonicParsing="false" onAction="#saveAim" prefHeight="44.0" prefWidth="44.0" text="Ok" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Saab" size="15.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="downButton" layoutX="1132.0" layoutY="592.0" mnemonicParsing="false" onMouseClicked="#stepToDown" onMousePressed="#moveToDown" onMouseReleased="#stopMove" prefHeight="44.0" prefWidth="44.0" text="D" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Saab" size="15.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="rightButton" layoutX="1178.0" layoutY="546.0" mnemonicParsing="false" onMouseClicked="#stepToRight" onMousePressed="#moveToRight" onMouseReleased="#stopMove" prefHeight="44.0" prefWidth="44.0" text="R" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Saab" size="15.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="leftButton" layoutX="1086.0" layoutY="546.0" mnemonicParsing="false" onMouseClicked="#stepToLeft" onMousePressed="#moveToLeft" onMouseReleased="#stopMove" prefHeight="44.0" prefWidth="44.0" text="L" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Saab" size="15.0" />
+                                 </font>
+                              </Button>
+                              <Line fx:id="verticalLine" endY="-110.0" layoutX="683.0" layoutY="368.0" startY="110.0" strokeWidth="3.0" />
+                              <Line fx:id="horizontalLine" endX="110.0" layoutX="684.0" layoutY="368.0" startX="-110.0" strokeWidth="3.0" />
+                              <Label fx:id="longitudeLabel" layoutX="743.0" layoutY="410.0" prefHeight="25.0" prefWidth="127.0" text="">
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="latitudeLabel" layoutX="743.0" layoutY="452.0" prefHeight="19.0" prefWidth="129.0" text="">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Pane layoutX="16.0" layoutY="448.0" prefHeight="243.0" prefWidth="242.0">
+                                 <children>
+                                    <Label layoutX="14.0" layoutY="14.0" text="Дальність" />
+                                    <TextField fx:id="distanceField" layoutX="80.0" layoutY="9.0" prefHeight="25.0" prefWidth="155.0" />
+                                    <Label layoutX="14.0" layoutY="42.0" text="Довгота" />
+                                    <TextField fx:id="longitudeField" layoutX="80.0" layoutY="37.0" prefHeight="25.0" prefWidth="155.0" />
+                                    <Label layoutX="14.0" layoutY="70.0" text="Широта" />
+                                    <TextField fx:id="latitudeField" layoutX="80.0" layoutY="65.0" prefHeight="25.0" prefWidth="155.0" />
+                                    <Label layoutX="14.0" layoutY="98.0" text="Висота" />
+                                    <TextField fx:id="heightField" layoutX="80.0" layoutY="93.0" prefHeight="25.0" prefWidth="155.0" />
+                                    <Label layoutX="14.0" layoutY="127.0" text="Азимут" />
+                                    <TextField fx:id="azimuthField" layoutX="80.0" layoutY="122.0" prefHeight="25.0" prefWidth="155.0" />
+                                    <Button fx:id="cancelButton" layoutX="31.0" layoutY="195.0" mnemonicParsing="false" onAction="#cancel" text="Сброс" />
+                                    <Button fx:id="getButton" layoutX="106.0" layoutY="195.0" mnemonicParsing="false" onAction="#getInfo" text="Отримати дані" />
+                                    <Label fx:id="elevationLabel" layoutX="13.0" layoutY="153.0" text="Кут місця" />
+                                    <TextField fx:id="elevationField" layoutX="81.0" layoutY="150.0" prefHeight="25.0" prefWidth="155.0" />
+                                 </children>
+                                 <opaqueInsets>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </opaqueInsets>
+                              </Pane>
+                           </children>
+                        </Pane>
+                     </children>
+                  </StackPane>
+               </content>
+          </Tab>
+            <Tab text="Інформація">
+                <content>
+                    <Pane prefHeight="703.0" prefWidth="1365.0">
+                        <children>
+                            <TableView fx:id="tableView" prefHeight="700.0" prefWidth="770.0">
+                                <columns>
+                              <TableColumn fx:id="aimId" editable="false" prefWidth="50.0" resizable="false" sortable="false" text="№" />
+                                    <TableColumn fx:id="latitude" editable="false" maxWidth="500.0" prefWidth="110.0" resizable="false" sortable="false" text="Широта" />
+                                    <TableColumn fx:id="longitude" editable="false" prefWidth="110.0" resizable="false" sortable="false" text="Довгота" />
+                                    <TableColumn fx:id="latitudeCK42" editable="false" prefWidth="110.0" resizable="false" sortable="false" text="Широта СК42" />
+                                    <TableColumn fx:id="longitudeCK42" editable="false" prefWidth="111.0" resizable="false" sortable="false" text="Довгота СК42" />
+                                    <TableColumn fx:id="distance" editable="false" prefWidth="110.0" resizable="false" sortable="false" text="Дальність" />
+                                    <TableColumn fx:id="path" editable="false" prefWidth="110.0" resizable="false" sortable="false" text="Фото" />
+                                </columns>
+                            </TableView>
+                        </children>
+                    </Pane>
+                </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>

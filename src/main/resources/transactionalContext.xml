@@ -31,7 +31,7 @@
             <value>
                 hibernate.dialect=org.hibernate.dialect.Oracle10gDialect
                 hibernate.show_sql=true
-                hibernate.hbm2ddl.auto=create
+                hibernate.hbm2ddl.auto=update
             </value>
         </property>
     </bean>

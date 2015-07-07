@@ -23,9 +23,10 @@ import java.nio.ByteBuffer;
  */
 public class Player {
 
-//    private static final String PATH_TO_VIDEO = "v4l2:///dev/video0";
+    private static final String PATH_TO_VIDEO = "v4l2:///dev/video0";
 //        private static final String PATH_TO_VIDEO = "rtsp://192.168.2.232//rtsp_tunnel";
-    private static final String PATH_TO_VIDEO = "rtsp://admin:12345@192.168.1.64//rtsp_tunnel";
+//        private static final String PATH_TO_VIDEO = "rtsp://192.168.1.201//rtsp_tunnel";
+//    private static final String PATH_TO_VIDEO = "rtsp://admin:12345@192.168.1.64//rtsp_tunnel";
 
     public Cams getCams() {
         return cams;

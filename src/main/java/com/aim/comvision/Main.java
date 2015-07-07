@@ -1,20 +1,18 @@
-package com.aim.test;
+package com.aim.comvision;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
- * Created by victor on 08.06.15.
+ * Created by victor on 06.07.15.
  */
-public class Exam extends Application {
-
+public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -26,10 +24,10 @@ public class Exam extends Application {
             }
 
         });
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/test.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/hello.fxml"));
         AnchorPane root = fxmlLoader.load();
         Controller controller = fxmlLoader.getController();
-        controller.initialize();
+        controller.init();
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Custom Control");
@@ -39,6 +37,4 @@ public class Exam extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
-
 }

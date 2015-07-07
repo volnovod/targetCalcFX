@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -24,6 +25,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.List;
 
@@ -115,6 +118,18 @@ public class Controller extends Pane {
     @FXML
     private Label elevationLabel;
 
+    @FXML
+    private Label latTexLab;
+
+    @FXML
+    private Label longTextLab;
+
+    @FXML
+    private Label distanceTextLab;
+
+    @FXML
+    private Label distanceLabel;
+
     private List<Aim> aimList;
     private SpringFXMLLoader springFXMLLoader;
     private Request status;
@@ -123,6 +138,7 @@ public class Controller extends Pane {
     private HomePositionRequest homePositionRequest;
     private Aim lastAim;
     private ObservableList<Aim> data;
+    private NumberFormat formatter;
 
 
     @FXML
@@ -154,8 +170,10 @@ public class Controller extends Pane {
         }
         if(data.size() != 0){
             lastAim = data.get(data.size()-1);
+            displayLastAim(formatter.format(lastAim.getLatitudeck42()), formatter.format(lastAim.getLongitudeck42()), String.valueOf(lastAim.getDistance()));
+        } else {
+            displayLastAim("", "", "Цілі відсутні");
         }
-        displayLastAim(lastAim);
         startBackgroundAnalyze();
 
     }
@@ -169,9 +187,10 @@ public class Controller extends Pane {
         this.tableView.setItems(data);
     }
 
-    public void displayLastAim(Aim aim){
-        latitudeLabel.setText(Double.toString(aim.getLatitudeck42()));
-        longitudeLabel.setText(Double.toString(aim.getLongitudeck42()));
+    public void displayLastAim(String latitudeCK42, String longitudeCK42, String distance){
+        latitudeLabel.setText(latitudeCK42);
+        longitudeLabel.setText(longitudeCK42);
+        distanceLabel.setText(distance);
     }
 
     @FXML
@@ -319,6 +338,7 @@ public class Controller extends Pane {
         distanceField.setText("");
 
 
+
         AimCalculatorImpl calculator = new AimCalculatorImpl();
         calculator.setHeight(height);
         calculator.calcCoordinate(latitude, longtitude, azimuth, distance);
@@ -332,6 +352,10 @@ public class Controller extends Pane {
                 File image = new File("img/" + (lastAim.getId()+1) + ".png");
                 ImageIO.write(bi, "png", image);
                 aim.setPath(image.getPath());
+            } else {
+                File image = new File("img/0.png");
+                ImageIO.write(bi, "png", image);
+                aim.setPath(image.getPath());
             }
 
         } catch (IOException ex) {
@@ -339,15 +363,20 @@ public class Controller extends Pane {
             ex.printStackTrace();
         }
 
+
         springFXMLLoader.getService().createAim(aim);
         data = FXCollections.observableArrayList(springFXMLLoader.getService().getAllAim());
         data = sortData(data);
         setTableData(data);
-        lastAim = data.get(data.size()-1);
+        if( data.size() !=0){
+            lastAim = data.get(data.size()-1);
+            displayLastAim(formatter.format(lastAim.getLatitudeck42()), formatter.format(lastAim.getLongitudeck42()), String.valueOf(lastAim.getDistance()) );
+        }
+
     }
 
     public Controller() {
-
+        this.formatter = new DecimalFormat("#0.000000");
         this.status = new Request();
         this.moveRequest = new MoveRequest();
         this.continuousMove = new ContinuousMove();
@@ -363,7 +392,7 @@ public class Controller extends Pane {
                     public void run() {
                         controlBackgroundFon();
                     }
-                }, 0, 5000);
+                }, 0, 3000);
     }
 
     @FXML
@@ -373,11 +402,17 @@ public class Controller extends Pane {
             horizontalLine.setStroke(Color.WHITE);
             longitudeLabel.setTextFill(Color.WHITE);
             latitudeLabel.setTextFill(Color.WHITE);
+            latTexLab.setTextFill(Color.WHITE);
+            longTextLab.setTextFill(Color.WHITE);
+            distanceTextLab.setTextFill(Color.WHITE);
         }else {
             verticalLine.setStroke(Color.BLACK);
             horizontalLine.setStroke(Color.BLACK);
             longitudeLabel.setTextFill(Color.BLACK);
             latitudeLabel.setTextFill(Color.BLACK);
+            latTexLab.setTextFill(Color.BLACK);
+            longTextLab.setTextFill(Color.BLACK);
+            distanceTextLab.setTextFill(Color.BLACK);
         }
     }
     Integer count = 0;
@@ -405,10 +440,12 @@ public class Controller extends Pane {
 
         BufferedImage image = player.getMediaPlayer().getSnapshot();
         if(image!=null){
-            int w = image.getWidth()/6;
-            int h = image.getHeight()/6;
+//            int w = image.getWidth()/6;
+//            int h = image.getHeight()/6;
+            int w = 40;
+            int h = 40;
 
-            int[] dataBuff = image.getRGB((image.getWidth()/2-w), (image.getHeight()/2-h), w, h, null, 0, w);
+            int[] dataBuff = image.getRGB( 663, 348, w, h, null, 0, w);
             java.awt.Color color = new java.awt.Color(dataBuff[100]);
             int red = color.getRed();
             int green = color.getGreen();
@@ -419,6 +456,8 @@ public class Controller extends Pane {
             String hexColor = hexRed + hexGreen + hexBlue;
             int rescolor = Integer.parseInt(hexColor,16);
             setLineColor(rescolor);
+//            System.out.println(verticalLine.getBoundsInParent().toString());
+//            System.out.println(horizontalLine.getStartY() + "    -   " + horizontalLine.getEndY());
         }
 
     }

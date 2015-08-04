@@ -5,9 +5,12 @@ import javafx.scene.Scene;
 import javafx.scene.image.*;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import oracle.jdbc.driver.DatabaseError;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Date;
+
 
 /**
  * Created by victor on 08.07.15.
@@ -19,7 +22,7 @@ public class MedianFilter extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        File file = new File("/home/victor/Java/workFX/2.png");
+        File file = new File("/home/victor/Java/workFX/auto.png");
         Image image = new Image(file.toURI().toString());
 
         PixelReader pixelReader = image.getPixelReader();
@@ -37,7 +40,9 @@ public class MedianFilter extends Application {
 
         ImageView imageView = new ImageView(image);
 
+        long start = new Date().getTime();
         int[][] transBuff = getMedian(buffer);
+        System.out.println((new Date().getTime()-start)/1000.0);
         WritableImage writableImage = new WritableImage((int)image.getWidth(), (int)image.getHeight());
         PixelWriter pixelWriter = writableImage.getPixelWriter();
         for (int i=0; i<height; i++){
@@ -57,22 +62,13 @@ public class MedianFilter extends Application {
 
 
 
-    public void filter(int[] pixelsArray, int width, int height){
-
-        int counter = 0;
-        int[][] pixels = vectorToArray(pixelsArray, width, height);
-
-
-
-    }
-
     public int[][] getMedian(int[][] inputPixels){
         int height = inputPixels.length;
         int width = inputPixels[0].length;
 
         int[][] window = new int[3][3];
 
-        int[] vectorFromWindow = new int[9];
+        int[] vectorFromWindow;
 
         for(int i=0; i < height-2; i++){
             for (int j = 0; j<width-2; j++){
@@ -92,6 +88,7 @@ public class MedianFilter extends Application {
 
         return inputPixels;
     }
+
 
     public int[][] vectorToArray(int[] input, int width, int height){
         int counter = 0;
@@ -119,6 +116,16 @@ public class MedianFilter extends Application {
 
     public static void main(String[] args) {
         launch(args);
+
+//        int[][] array ={{1,22,3,4,5,63,7,38,9,10},{1,23,3,43,5,63,7,8,9,10},{1,2,33,4,5,63,7,8,9,310},{1,2,3,43,5,6,7,8,9,10},
+//                {13,42,3,4,5,6,7,8,9,1010},{1,23,3,4,53,6,744,8,94,10}};
+//        int[][] out = new MedianFilter().getMedian(array);
+//        for(int i=0; i<array.length; i++){
+//            for (int j=0; j<array[0].length; j++){
+//                System.out.print(out[i][j] + " ");
+//            }
+//            System.out.println();
+//        }
     }
 
 }

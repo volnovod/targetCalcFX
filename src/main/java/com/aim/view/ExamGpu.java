@@ -17,6 +17,9 @@ import java.util.Random;
  */
 public class ExamGpu {
 
+
+
+
     public static void main(String[] args) {
 
         double[] fftResults;
@@ -24,10 +27,6 @@ public class ExamGpu {
 
         System.out.println("Генерация входных данных размером "+dataSize+" значений...\n");
         float[] inputData = createRandomData(dataSize);
-
-//        System.out.println("1D БПФ с использованием apache commons math...");
-//        fftResults = commonsTransform(floatDataToDoubleData(inputData.clone()));
-//        printSomeValues(fftResults);
 
         System.out.println();
         System.out.println("1D БПФ JCufft (данные в оперативной памяти)...");

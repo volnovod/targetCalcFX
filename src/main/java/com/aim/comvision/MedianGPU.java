@@ -28,7 +28,7 @@ public class MedianGPU {
 //        int threads = 6;
 //        int size = 10;
 
-        File file = new File("/home/victor/Java/workFX/lena_noiseImg.jpg");
+        File file = new File("/home/victor/Java/workFX/auto.png");
         BufferedImage bufferedImage = null;
         try {
 
@@ -48,7 +48,6 @@ public class MedianGPU {
         for (int i = 0; i<int_array.length; i++){
             in_array[i] = int_array[i];
         }
-        long start = new Date().getTime();
         cuInit(0);
         CUdevice device = new CUdevice();
         cuDeviceGet(device, 0);
@@ -60,6 +59,7 @@ public class MedianGPU {
         CUfunction function = new CUfunction();
         cuModuleGetFunction(function, module, "filter");
 
+        long start = new Date().getTime();
         CUdeviceptr input = new CUdeviceptr();
         cuMemAlloc(input, size * threads * Sizeof.LONG);
 
@@ -86,8 +86,8 @@ public class MedianGPU {
                 kernelParam, null // Kernel- and extra parameters
         );
         long[] o_array = new long[size * threads];
-        System.out.println("time " + (new Date().getTime()-start)/1000.0 );
         cuMemcpyDtoH(Pointer.to(o_array), out, size * threads * Sizeof.LONG);
+        System.out.println("time " + (new Date().getTime()-start)/1000.0  + "s");
 
         cuMemFree(input);
         cuMemFree(out);

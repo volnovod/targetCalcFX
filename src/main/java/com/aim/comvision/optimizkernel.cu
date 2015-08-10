@@ -3,6 +3,23 @@ extern "C"
 #define BLOCK_WIDTH 16
 #define BLOCK_HEIGHT 16
 
+#define CUDA_DEBUG
+
+#ifdef CUDA_DEBUG
+
+#define CUDA_CHECK_ERROR(err)           \
+if (err != cudaSuccess) {          \
+printf("Cuda error: %s\n", cudaGetErrorString(err));    \
+printf("Error in file: %s, line: %i\n", __FILE__, __LINE__);  \
+}                 \
+
+#else
+
+#define CUDA_CHECK_ERROR(err)
+
+#endif
+
+
 __global__ void filter(long *Input_Image, long *Output_Image, int Image_Width, int Image_Height) {
 
     long surround[9];

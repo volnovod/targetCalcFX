@@ -1,8 +1,10 @@
 package com.aim.comvision;
 
+import javafx.scene.image.Image;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.driver.*;
+import jcuda.runtime.cudaEvent_t;
 
 import javax.imageio.ImageIO;
 import java.awt.image.*;
@@ -19,14 +21,26 @@ import static jcuda.driver.JCudaDriver.cuMemFree;
  */
 public class OptimizFilter {
 
+    public long[] getArrayFromImage(Image image){
+
+        if (image == null){
+            return null;
+        }
+
+        long[] outArray = new long[(int) (image.getHeight() * image.getWidth())];
+        int iterator = 0;
+        for (int i=0; i < image.getHeight(); i++){
+            for (int j=0; j < image.getWidth(); j++){
+                outArray[iterator] =  image.getPixelReader().getArgb(j,i);
+                iterator++;
+            }
+        }
+        return outArray;
+    }
+
     public static void main(String[] args) {
 
-//        long[] in_array ={1,22,3,4,5,63,7,38,9,10,1,23,3,43,5,63,7,8,9,10,1,2,33,4,5,63,7,8,9,310,1,2,3,43,5,6,7,8,9,10,
-//                13,42,3,4,5,6,7,8,9,1010,1,23,3,4,53,6,744,8,94,10};
-//        int threads = 6;
-//        int size = 10;
-
-        File file = new File("/home/victor/Java/workFX/6.jpg");
+        File file = new File("/home/victor/Java/workFX/lena_noiseImg.jpg");
         BufferedImage bufferedImage = null;
         try {
 
@@ -37,22 +51,13 @@ public class OptimizFilter {
         }
 
 
+
         int threads = bufferedImage.getHeight();
         int size = bufferedImage.getWidth();
 
         int[] int_array = bufferedImage.getRGB(0,0,size, threads, null, 0, size);
-        long[] o_array = new long[size * threads];
+        int[] o_array = new int[size * threads];
 
-        long[] in_array = new long[int_array.length];
-        for (int i = 0; i<int_array.length; i++){
-            in_array[i] = int_array[i];
-        }
-        int numElements = threads * size;
-
-        int blockSizeX = 16;
-        int blockSizeY = 16;
-        int gridSizeX = (int)Math.ceil((double)size / blockSizeX);
-        int gridSizeY = (int)Math.ceil((double)threads/ blockSizeY );
 
         cuInit(0);
         CUdevice device = new CUdevice();
@@ -61,20 +66,26 @@ public class OptimizFilter {
         cuCtxCreate(pctx, 0, device);
 
         CUmodule module = new CUmodule();
-        cuModuleLoad(module, "/home/victor/Java/workFX/src/main/java/com/aim/comvision/optimizkernel.ptx");
+        cuModuleLoad(module, "/home/victor/Java/workFX/src/main/java/com/aim/comvision/sharedFilter.ptx");
         CUfunction function = new CUfunction();
         cuModuleGetFunction(function, module, "filter");
 
 
-        long start = new Date().getTime();
+
         CUdeviceptr input = new CUdeviceptr();
         CUdeviceptr out = new CUdeviceptr();
 
-        cuMemAlloc(input, size * threads * Sizeof.LONG);
+        cuMemAlloc(input, size * threads * Sizeof.INT);
 
-        cuMemcpyHtoD(input, Pointer.to(in_array), size * threads * Sizeof.LONG);
+        long start = new Date().getTime();
+        cuMemcpyHtoD(input, Pointer.to(int_array), size * threads * Sizeof.INT);
 
-        cuMemAlloc(out, size * threads * Sizeof.LONG);
+        cuMemAlloc(out, size * threads * Sizeof.INT);
+
+        int blockSizeX = 16;
+        int blockSizeY = 16;
+        int gridSizeX = (int)Math.ceil((double)size / blockSizeX);
+        int gridSizeY = (int)Math.ceil((double)threads/ blockSizeY );
 
         Pointer kernelParam = Pointer.to(Pointer.to(input),
                 Pointer.to(out),
@@ -86,8 +97,9 @@ public class OptimizFilter {
                 0, null,               // Shared memory size and stream
                 kernelParam, null // Kernel- and extra parameters
         );
-        System.out.println("time " + (new Date().getTime()-start)/1.0 + " ms");
-        cuMemcpyDtoH(Pointer.to(o_array), out, size * threads * Sizeof.LONG);
+        cuMemcpyDtoH(Pointer.to(o_array), out, size * threads * Sizeof.INT);
+        System.out.println("time " + (new Date().getTime() - start) / 1.0 + " ms");
+
 
         cuMemFree(input);
         cuMemFree(out);
@@ -96,12 +108,8 @@ public class OptimizFilter {
 
         DirectColorModel cm = (DirectColorModel) ColorModel.getRGBdefault();
 
-        int[] buf_arr = new int[o_array.length];
-        for (int i = 0; i < o_array.length; i++){
-            buf_arr[i] = (int)o_array[i];
-        }
 
-        DataBufferInt buffer = new DataBufferInt(buf_arr, size*threads);
+        DataBufferInt buffer = new DataBufferInt(o_array, size*threads);
         WritableRaster raster = Raster.createPackedRaster(buffer, size, threads,size, cm.getMasks(), null);
         BufferedImage out1 =  new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
 

@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.image.*;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import oracle.jdbc.driver.DatabaseError;
 
 import java.io.File;
 import java.util.Arrays;

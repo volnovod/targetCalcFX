@@ -1,13 +1,10 @@
 package com.aim.comvision;
 
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.*;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.driver.*;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +25,7 @@ public class MedianGPU {
 //        int threads = 6;
 //        int size = 10;
 
-        File file = new File("/home/victor/Java/workFX/auto.png");
+        File file = new File("test/test0.png");
         BufferedImage bufferedImage = null;
         try {
 
@@ -41,8 +38,8 @@ public class MedianGPU {
 
         int threads = bufferedImage.getHeight();
         int size = bufferedImage.getWidth();
-
         int[] int_array = bufferedImage.getRGB(0,0,size, threads, null, 0, size);
+
 
         long[] in_array = new long[int_array.length];
         for (int i = 0; i<int_array.length; i++){
@@ -87,7 +84,7 @@ public class MedianGPU {
         );
         long[] o_array = new long[size * threads];
         cuMemcpyDtoH(Pointer.to(o_array), out, size * threads * Sizeof.LONG);
-        System.out.println("time " + (new Date().getTime()-start)/1000.0  + "s");
+        System.out.println("time " + (new Date().getTime()-start)  + "ms");
 
         cuMemFree(input);
         cuMemFree(out);

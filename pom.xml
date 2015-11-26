@@ -8,6 +8,7 @@
     <artifactId>aimJavaFX</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+
     <properties>
         <log4j.version>1.2.17</log4j.version>
         <hibernate.version>4.3.6.Final</hibernate.version>
@@ -19,11 +20,17 @@
 
     <dependencies>
 
-        <!--<dependency>-->
-            <!--<groupId>org.nd4j</groupId>-->
-            <!--<artifactId>jcuda</artifactId>-->
-            <!--<version>6.5</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.github.sarxos</groupId>
+            <artifactId>webcam-capture</artifactId>
+            <version>0.3.10</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.sarxos</groupId>
+            <artifactId>webcam-capture-driver-ipcam</artifactId>
+            <version>0.3.10</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -51,11 +58,11 @@
             <version>3.2.0</version>
     </dependency>
 
-    <dependency>
-        <groupId>com.oracle</groupId>
-        <artifactId>ojdbc14</artifactId>
-        <version>10.2.0.5.0</version>
-    </dependency>
+    <!--<dependency>-->
+        <!--<groupId>com.oracle</groupId>-->
+        <!--<artifactId>ojdbc14</artifactId>-->
+        <!--<version>10.2.0.5.0</version>-->
+    <!--</dependency>-->
 
     <dependency><groupId>javassist</groupId>
         <artifactId>javassist</artifactId>
@@ -166,6 +173,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
 
         </plugins>

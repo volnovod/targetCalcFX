@@ -19,13 +19,7 @@ public class Example {
 
 
     public static void main(String[] args) throws Exception{
-//
-//        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber("rtsp://admin:12345@192.168.1.64//rtsp_tunnel");
-//
-//        grabber.start();
-//        OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
-//        opencv_core.IplImage iplImage = converter.convert(grabber.grab());
-//        CanvasFrame frame = new CanvasFrame("Video", CanvasFrame.getDefaultGamma()/grabber.getGamma());
+
 
         double[] fftResults;
         int dataSize = 1<<23;
@@ -75,7 +69,7 @@ public class Example {
         // выполнение БПФ
         long timeStart = new Date().getTime();
         JCufft.cufftExecR2C(plan, inputData, fftResults);
-        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)/1000.0+" сек");
+        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)+" mсек");
         // уничтожение плана
         JCufft.cufftDestroy(plan);
 
@@ -105,7 +99,7 @@ public class Example {
         // выполнение БПФ
         long timeStart = new Date().getTime();
         JCufft.cufftExecR2C(plan, deviceDataIn, deviceDataOut);
-        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)/1000.+" сек");
+        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)+" mсек");
 
         // копирование результатов из памяти видеокарты в оперативную память
         JCuda.cudaMemcpy(Pointer.to(fftResults), deviceDataOut, fftResults.length * 4,

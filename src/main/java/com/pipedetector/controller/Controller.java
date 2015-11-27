@@ -5,6 +5,7 @@ import com.github.sarxos.webcam.ds.ipcam.IpCamDriver;
 import com.github.sarxos.webcam.ds.ipcam.IpCamStorage;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.input.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
@@ -52,6 +53,9 @@ public class Controller {
 
     @FXML
     private Rectangle rectangle;
+
+    @FXML
+    private Button findButton;
 
     public BufferedImage getImage() {
         return image;
@@ -147,11 +151,6 @@ public class Controller {
             e.printStackTrace();
         }
 
-        for (int i=0; i<(image.getHeight()-getHeight()); i++){
-            for (int j=0; j<(image.getWidth()-getWidth()); j++){
-
-            }
-        }
     }
 
     public void setImageView(){
@@ -160,8 +159,37 @@ public class Controller {
     }
 
 
+    @FXML
+    public void findEtalon() {
+
+        double[][] fullImage = new double[image.getWidth()][image.getHeight()];
+
+        for (int i = 0; i < image.getWidth(); i++) {
+            for (int j = 0; j < image.getHeight(); j++) {
+                fullImage[i][j] = image.getRGB(i, j);
+            }
+        }
+
+//        double[] korelation=new double[];
+        int foundx=0;
+        int foundy=0;
+        double[][] temp = new double[getWidth()][getHeight()];
+        for (int i=0, k=0; i< (image.getWidth()-getWidth()); i++ ){
+            for (int j=0, l=0; j<(image.getHeight()-getHeight()); j++){
 
 
+                    if (l<getHeight()){
+//                        korelation += Math.abs(fullImage[i][j]-etalonMatrix[k][l]);
+                        l++;
+
+                    }
+            }
+            if(k<getWidth()){
+                k++;
+            }
+
+        }
+    }
 
 
 }

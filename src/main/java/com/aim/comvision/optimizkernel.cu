@@ -3,26 +3,11 @@ extern "C"
 #define BLOCK_WIDTH 16
 #define BLOCK_HEIGHT 16
 
-#define CUDA_DEBUG
-
-#ifdef CUDA_DEBUG
-
-#define CUDA_CHECK_ERROR(err)           \
-if (err != cudaSuccess) {          \
-printf("Cuda error: %s\n", cudaGetErrorString(err));    \
-printf("Error in file: %s, line: %i\n", __FILE__, __LINE__);  \
-}                 \
-
-#else
-
-#define CUDA_CHECK_ERROR(err)
-
-#endif
 
 
-__global__ void filter(long *Input_Image, long *Output_Image, int Image_Width, int Image_Height) {
+__global__ void filter(int *Input_Image, int *Output_Image, int Image_Width, int Image_Height) {
 
-    long surround[9];
+    int surround[9];
 
     int iterator;
 
@@ -48,7 +33,7 @@ __global__ void filter(long *Input_Image, long *Output_Image, int Image_Width, i
         for (int l=i+1; l<9; ++l) if (surround[l] < surround[minval]) minval=l;
 
         // --- Put found minimum element in its place
-        long temp = surround[i];
+        int temp = surround[i];
         surround[i]=surround[minval];
         surround[minval]=temp;
     }

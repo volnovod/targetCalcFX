@@ -84,7 +84,7 @@ public class ExamGpu {
         // выполнение БПФ
         long timeStart = new Date().getTime();
         JCufft.cufftExecR2C(plan, inputData, fftResults);
-        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)/1000.0+" сек");
+        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)+" сек");
         // уничтожение плана
         JCufft.cufftDestroy(plan);
 
@@ -121,7 +121,7 @@ public class ExamGpu {
         // выполнение БПФ
         long timeStart = new Date().getTime();
         JCufft.cufftExecR2C(plan, deviceDataIn, deviceDataOut);
-        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)/1000.+" сек");
+        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)+" сек");
 
         // копирование результатов из памяти видеокарты в оперативную память
         JCuda.cudaMemcpy(Pointer.to(fftResults), deviceDataOut, fftResults.length * 4,

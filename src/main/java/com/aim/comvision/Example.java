@@ -4,6 +4,10 @@ import jcuda.Pointer;
 import jcuda.jcufft.*;
 import jcuda.runtime.*;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
 
@@ -11,11 +15,33 @@ import java.util.Random;
 import org.apache.commons.math.complex.Complex;
 import org.apache.commons.math.transform.FastFourierTransformer;
 
+import javax.imageio.ImageIO;
+
 /**
  * Created by victor on 24.06.15.
  */
 public class Example {
 
+
+     static BufferedImage image;
+     static float[] inputData;
+
+    public static void setImage(String url){
+        File file1 = new File(url);
+        image= new BufferedImage(1024, 512, BufferedImage.TYPE_BYTE_GRAY);
+        try {
+
+            image = ImageIO.read(new FileInputStream(file1));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public static void setArrayData(){
+        image.getRaster().getPixels(128,104,1024,512,inputData);
+    }
 
 
     public static void main(String[] args) throws Exception{
@@ -27,15 +53,14 @@ public class Example {
 //        opencv_core.IplImage iplImage = converter.convert(grabber.grab());
 //        CanvasFrame frame = new CanvasFrame("Video", CanvasFrame.getDefaultGamma()/grabber.getGamma());
 
+
         double[] fftResults;
-        int dataSize = 1<<23;
-
-        System.out.println("Генерация входных данных размером "+dataSize+" значений...\n");
-        float[] inputData = createRandomData(dataSize);
-
-//        System.out.println("1D БПФ с использованием apache commons math...");
-//        fftResults = commonsTransform(floatDataToDoubleData(inputData.clone()));
-//        printSomeValues(fftResults);
+        inputData = new float[1024*512];
+        setImage("/home/victor/Java/workFX/img/testNoise21.png");
+        setArrayData();
+        System.out.println("1D БПФ с использованием apache commons math...");
+        fftResults = commonsTransform(floatDataToDoubleData(inputData.clone()));
+        printSomeValues(fftResults);
 
         System.out.println();
         System.out.println("1D БПФ JCufft (данные в оперативной памяти)...");
@@ -44,7 +69,9 @@ public class Example {
 
         System.out.println();
         System.out.println("1D БПФ JCufft (данные в памяти видеокарты)...");
+        long start = new Date().getTime();
         fftResults = jcudaTransformDeviceMemory(inputData.clone());
+        System.out.println("time"+(new Date().getTime()-start)/1000.0);
         printSomeValues(fftResults);
 
     }
@@ -69,11 +96,11 @@ public class Example {
 
     public static double[] jcudaTransformHostMemory(float[] inputData){
         float[] fftResults = new float[inputData.length + 2];
+        long timeStart = new Date().getTime();
         // создание плана
         cufftHandle plan = new cufftHandle();
         JCufft.cufftPlan1d(plan, inputData.length, cufftType.CUFFT_R2C, 1);
         // выполнение БПФ
-        long timeStart = new Date().getTime();
         JCufft.cufftExecR2C(plan, inputData, fftResults);
         System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)/1000.0+" сек");
         // уничтожение плана
@@ -86,6 +113,7 @@ public class Example {
 
         float[] fftResults = new float[inputData.length + 2];
 
+        long timeStart = new Date().getTime();
         // указатель на устройство
         Pointer deviceDataIn = new Pointer();
         // выделение памяти на видеокарте для входных данных
@@ -103,11 +131,10 @@ public class Example {
         JCufft.cufftPlan1d(plan, inputData.length, cufftType.CUFFT_R2C, 1);
 
         // выполнение БПФ
-        long timeStart = new Date().getTime();
         JCufft.cufftExecR2C(plan, deviceDataIn, deviceDataOut);
-        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart)/1000.+" сек");
 
         // копирование результатов из памяти видеокарты в оперативную память
+        System.out.println("Время преобразования: " + (new Date().getTime() - timeStart) / 1000.0 + " сек");
         JCuda.cudaMemcpy(Pointer.to(fftResults), deviceDataOut, fftResults.length * 4,
                 cudaMemcpyKind.cudaMemcpyDeviceToHost);
 

@@ -1,28 +1,32 @@
 package com.aim.comvision;
 
+/**
+ * Created by victor on 10.08.15.
+ */
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.*;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-//import oracle.jdbc.driver.DatabaseError;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 
 
+
 /**
  * Created by victor on 08.07.15.
  */
-public class MedianFilter extends Application {
+public class MedianCPU extends Application {
 
-    public MedianFilter() {
+    public MedianCPU() {
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        File file = new File("/home/victor/Java/workFX/auto.png");
+        File file = new File("/home/victor/Java/workFX/img/noise.png");
         Image image = new Image(file.toURI().toString());
 
         PixelReader pixelReader = image.getPixelReader();
@@ -129,3 +133,4 @@ public class MedianFilter extends Application {
     }
 
 }
+

@@ -3,25 +3,30 @@ package com.aim.test;
 import com.aim.SpringLoader.SpringFXMLLoader;
 import com.aim.aimcalculator.AimCalculatorImpl;
 import com.aim.cams.Cams;
-import com.aim.hickvisonrequests.ContinuousMove;
-import com.aim.hickvisonrequests.HomePositionRequest;
-import com.aim.hickvisonrequests.MoveRequest;
-import com.aim.hickvisonrequests.Request;
+import com.aim.hickvisonrequests.*;
 import com.aim.model.Aim;
 import com.aim.view.Player;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -29,13 +34,24 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.List;
+import java.util.Timer;
 
 /**
  * Created by victor on 08.06.15.
  */
-public class Controller extends Pane {
+public class ShooterController extends Pane {
 
     private Player player;
+
+    public Stage getShooterStage() {
+        return shooterStage;
+    }
+
+    public void setShooterStage(Stage shooterStage) {
+        this.shooterStage = shooterStage;
+    }
+
+    private Stage shooterStage;
 
     @FXML
     private Pane videoPane;
@@ -130,11 +146,75 @@ public class Controller extends Pane {
     @FXML
     private Label distanceLabel;
 
+    @FXML
+    private Button zoomadd;
+
+    @FXML
+    private Button zoomsub;
+
+    @FXML
+    private  Button modeButton;
+
+    @FXML
+    private Button firstButton;
+
+    @FXML
+    private Button secondButton;
+
+    @FXML
+    private Button thirdButton;
+
+    @FXML
+    private Button fourthButton;
+
+    @FXML
+    private Button fifthButton;
+
+    @FXML
+    private Button sixthButton;
+
+    @FXML
+    private ComboBox choiseBox;
+
+
+    @FXML
+    private Pane compass;
+
+    @FXML
+    private Text compassValue;
+
+    @FXML
+    private Pane compassPane;
+
+
+
+    private Chooser first = new Chooser();
+    private Chooser second = new Chooser();
+    private Chooser third = new Chooser();
+    private Chooser fourth = new Chooser();
+    private Chooser fifth = new Chooser();
+    private Chooser sixth = new Chooser();
+
+
+
+    public int getModeState() {
+        return modeState;
+    }
+
+    public void setModeState(int modeState) {
+        this.modeState = modeState;
+    }
+
+    private int modeState=1;
+
+
+
     private List<Aim> aimList;
     private SpringFXMLLoader springFXMLLoader;
     private Request status;
     private MoveRequest moveRequest;
     private ContinuousMove continuousMove;
+    private ZoomRequest zoomRequest;
     private HomePositionRequest homePositionRequest;
     private Aim lastAim;
     private ObservableList<Aim> data;
@@ -165,6 +245,9 @@ public class Controller extends Pane {
         player = new Player();
         player.setPlayerHolder(videoPane);
         player.initialize();
+        this.setFirstMode();
+        this.choiseBox.getSelectionModel().select(0);
+
         if(player.getCams() == Cams.HICKVISION){
             goToHomePosition();
         }
@@ -176,7 +259,59 @@ public class Controller extends Pane {
         }
         startBackgroundAnalyze();
 
+
+
     }
+    javax.swing.Timer timer = new javax.swing.Timer(40, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            compass.setRotate(compass.getRotate()+1);
+            compassValue.setText(String.valueOf((int)(compass.getRotate())));
+            if (compass.getRotate()==360){
+
+                compass.setRotate(0);
+            }
+
+        }
+    });
+
+
+    @FXML
+    public void play(){
+        player.initialize();
+    }
+
+    @FXML
+    public void stop(){
+        player.stop();
+    }
+
+    @FXML
+    public void changeScene() throws IOException {
+//        Stage stage;
+//        Parent root;
+//
+//        if (choiseBox.getValue().equals("Наводчик")){
+////            player.stop();
+//            System.out.println("--------------------------------------");
+//            FXMLLoader loader = new  FXMLLoader(getClass().getResource("/fxml/test.fxml"));
+//            root = loader.load();
+//            AimerController aimerController = loader.getController();
+////            stage = (Stage) choiseBox.getScene().getWindow();
+//            stage = new Stage();
+//            aimerController.setShoterStage(stage);
+//            aimerController.initialize(this.player);
+////            aimerController.setPlayer(player);
+//            stage.setScene(new Scene(root));
+//            this.shooterStage.close();
+//            stage.show();
+//            return;
+//        }
+    }
+
+
+
+
 
     public ObservableList<Aim> sortData(ObservableList<Aim> data){
         Collections.sort(data, (Aim aim1, Aim aim2) -> aim1.getId().compareTo(aim2.getId()));
@@ -194,13 +329,115 @@ public class Controller extends Pane {
     }
 
     @FXML
+    protected void modeChooser(){
+        if (getModeState()==1){
+            this.setSecondMode();
+            return;
+        }
+        if (getModeState()==2){
+            this.setFirstMode();
+            return;
+        }
+    }
+
+    public void setFirstMode(){
+        setModeState(1);
+
+        this.modeButton.setText("Mode 1");
+        setDefaultButton(firstButton, first);
+        this.firstButton.setText("F11");
+        setDefaultButton(secondButton, second);
+        this.secondButton.setText("F12");
+        setDefaultButton(thirdButton, third);
+        this.thirdButton.setText("Компас");
+        setDefaultButton(fourthButton, fourth);
+        this.fourthButton.setText("F14");
+        setDefaultButton(fifthButton, fifth);
+        this.fifthButton.setText("F15");
+        setDefaultButton(sixthButton, sixth);
+        this.sixthButton.setText("F16");
+    }
+
+    public void setDefaultButton(Button button, Chooser chooser){
+        button.setStyle("-fx-base: rgba(226, 232, 227, 1);");
+        chooser.setValue(false);
+    }
+
+    public void setSecondMode(){
+        setModeState(2);
+
+        this.modeButton.setText("Mode 2");
+        this.firstButton.setText("F21");
+        setDefaultButton(firstButton, first);
+        this.secondButton.setText("F22");
+        setDefaultButton(secondButton, second);
+        this.thirdButton.setText("F23");
+        setDefaultButton(thirdButton, third);
+        this.fourthButton.setText("F24");
+        setDefaultButton(fourthButton, fourth);
+        this.fifthButton.setText("F25");
+        setDefaultButton(fifthButton, fifth);
+        this.sixthButton.setText("F26");
+        setDefaultButton(sixthButton, sixth);
+    }
+
+    @FXML
+    protected void firstAction(){
+        buttonColorChooser(firstButton, first);
+    }
+    @FXML
+    protected void secondAction(){
+        buttonColorChooser(secondButton, second);
+    }
+    @FXML
+    protected void thirdAction(){
+        buttonColorChooser(thirdButton, third);
+        if (getModeState()==1){
+            if (third.isValue()){
+                compassPane.setVisible(true);
+                timer.start();
+            } else {
+                compassPane.setVisible(false);
+                timer.stop();
+            }
+        }
+
+    }
+    @FXML
+    protected void fourthAction(){
+        buttonColorChooser(fourthButton, fourth);
+    }
+    @FXML
+    protected void fifthAction(){
+        buttonColorChooser(fifthButton, fifth);
+    }
+    @FXML
+    protected void sixthAction(){
+        buttonColorChooser(sixthButton, sixth);
+    }
+
+    public void buttonColorChooser(Button button, Chooser change){
+        if(!change.isValue()){
+            button.setStyle("-fx-base: rgba(144, 231, 153, 1);");
+            change.setValue(true);
+
+            return;
+        }
+        if (change.isValue()){
+            button.setStyle("-fx-base: rgba(226, 232, 227, 1);");
+            change.setValue(false);
+            return;
+        }
+    }
+
+    @FXML
     protected void stepToRight(){
         if(ifHickvision()) {
             new Thread() {
                 public void run() {
                     Platform.runLater(() -> {
                         status.start();
-                        moveRequest.setRequest(Double.parseDouble(status.getElevation()) * 10, ((Double.parseDouble(status.getAzimuth()) + 1) * 10));
+                        moveRequest.setRequest(Double.parseDouble(status.getElevation()) * 10, ((Double.parseDouble(status.getAzimuth()) + 1) * 10), ((Double.parseDouble(status.getZoom()))*10));
                         moveRequest.start();
                     });
                 }
@@ -214,7 +451,7 @@ public class Controller extends Pane {
             new Thread() {
                 public void run() {
                     Platform.runLater(() -> {
-                        continuousMove.setRequest(50, 0);
+                        continuousMove.setRequest(50, 0, 0);
                         continuousMove.start();
                     });
                 }
@@ -229,7 +466,7 @@ public class Controller extends Pane {
                 public void run() {
                     Platform.runLater(() -> {
 
-                        continuousMove.setRequest(0, 0);
+                        continuousMove.setRequest(0, 0, 0);
                         continuousMove.start();
                     });
                 }
@@ -244,7 +481,7 @@ public class Controller extends Pane {
                 public void run() {
                     Platform.runLater(() -> {
                         status.start();
-                        moveRequest.setRequest(Double.parseDouble(status.getElevation()) * 10, ((Double.parseDouble(status.getAzimuth()) - 1) * 10));
+                        moveRequest.setRequest(Double.parseDouble(status.getElevation()) * 10, ((Double.parseDouble(status.getAzimuth()) - 1) * 10), ((Double.parseDouble(status.getZoom()))*10));
                         moveRequest.start();
                     });
                 }
@@ -258,7 +495,7 @@ public class Controller extends Pane {
             new Thread() {
                 public void run() {
                     Platform.runLater(() -> {
-                        continuousMove.setRequest(-50, 0);
+                        continuousMove.setRequest(-50, 0, 0);
                         continuousMove.start();
                     });
                 }
@@ -273,7 +510,7 @@ public class Controller extends Pane {
                 public void run() {
                     Platform.runLater(() -> {
                         status.start();
-                        moveRequest.setRequest(((Double.parseDouble(status.getElevation())) + 1) * 10, (Double.parseDouble(status.getAzimuth())) * 10);
+                        moveRequest.setRequest(((Double.parseDouble(status.getElevation())) + 1) * 10, (Double.parseDouble(status.getAzimuth())) * 10, ((Double.parseDouble(status.getZoom()))*10));
                         moveRequest.start();
                     });
                 }
@@ -287,7 +524,7 @@ public class Controller extends Pane {
             new Thread() {
                 public void run() {
                     Platform.runLater(() -> {
-                        continuousMove.setRequest(0, -25);
+                        continuousMove.setRequest(0, -25, 0);
                         continuousMove.start();
                     });
                 }
@@ -302,7 +539,7 @@ public class Controller extends Pane {
                 public void run() {
                     Platform.runLater(() -> {
                         status.start();
-                        moveRequest.setRequest(((Double.parseDouble(status.getElevation())) - 1) * 10, (Double.parseDouble(status.getAzimuth())) * 10);
+                        moveRequest.setRequest(((Double.parseDouble(status.getElevation())) - 1) * 10, (Double.parseDouble(status.getAzimuth())) * 10, (Double.parseDouble(status.getZoom()))*10);
                         moveRequest.start();
                     });
                 }
@@ -316,8 +553,64 @@ public class Controller extends Pane {
             new Thread() {
                 public void run() {
                     Platform.runLater(() -> {
-                        continuousMove.setRequest(0, 25);
+                        continuousMove.setRequest(0, 25, 0);
                         continuousMove.start();
+                    });
+                }
+            }.start();
+        }
+    }
+
+    @FXML
+    protected void startzoomadd(){
+        if (ifHickvision()){
+            new Thread(){
+                public void run(){
+                    Platform.runLater(() -> {
+                        zoomRequest.setRequest(20);
+                        zoomRequest.start();
+                    });
+                }
+            }.start();
+        }
+    }
+
+    @FXML
+    protected void stopzoomadd(){
+        if (ifHickvision()){
+            new Thread(){
+                public void run(){
+                    Platform.runLater(() -> {
+                        zoomRequest.setRequest(0);
+                        zoomRequest.start();
+                    });
+                }
+            }.start();
+        }
+    }
+
+    @FXML
+    protected void startzoomsub(){
+        if (ifHickvision()){
+            new Thread(){
+                public void run(){
+                    Platform.runLater(() -> {
+                        zoomRequest.setRequest(-20);
+                        zoomRequest.start();
+                    });
+                }
+            }.start();
+        }
+    }
+
+    @FXML
+    protected void stopzoomsub(){
+        if (ifHickvision()){
+            new Thread(){
+                public void run(){
+                    Platform.runLater(() -> {
+                        zoomRequest.setRequest(0);
+                        zoomRequest.start();
                     });
                 }
             }.start();
@@ -375,12 +668,15 @@ public class Controller extends Pane {
 
     }
 
-    public Controller() {
+    public ShooterController() {
         this.formatter = new DecimalFormat("#0.000000");
         this.status = new Request();
         this.moveRequest = new MoveRequest();
         this.continuousMove = new ContinuousMove();
         this.homePositionRequest = new HomePositionRequest();
+        this.zoomRequest  =new ZoomRequest();
+        this.moveRequest.setZoom(this.zoomRequest);
+        this.continuousMove.setZoom(this.zoomRequest);
     }
 
 
@@ -402,6 +698,7 @@ public class Controller extends Pane {
             horizontalLine.setStroke(Color.WHITE);
             longitudeLabel.setTextFill(Color.WHITE);
             latitudeLabel.setTextFill(Color.WHITE);
+            distanceLabel.setTextFill(Color.WHITE);
             latTexLab.setTextFill(Color.WHITE);
             longTextLab.setTextFill(Color.WHITE);
             distanceTextLab.setTextFill(Color.WHITE);
@@ -410,6 +707,7 @@ public class Controller extends Pane {
             horizontalLine.setStroke(Color.BLACK);
             longitudeLabel.setTextFill(Color.BLACK);
             latitudeLabel.setTextFill(Color.BLACK);
+            distanceLabel.setTextFill(Color.BLACK);
             latTexLab.setTextFill(Color.BLACK);
             longTextLab.setTextFill(Color.BLACK);
             distanceTextLab.setTextFill(Color.BLACK);
@@ -440,12 +738,10 @@ public class Controller extends Pane {
 
         BufferedImage image = player.getMediaPlayer().getSnapshot();
         if(image!=null){
-//            int w = image.getWidth()/6;
-//            int h = image.getHeight()/6;
-            int w = 40;
-            int h = 40;
+            int w = 60;
+            int h = 60;
 
-            int[] dataBuff = image.getRGB( 663, 348, w, h, null, 0, w);
+            int[] dataBuff = image.getRGB( 610, 330, w, h, null, 0, w);
             java.awt.Color color = new java.awt.Color(dataBuff[100]);
             int red = color.getRed();
             int green = color.getGreen();
@@ -456,8 +752,6 @@ public class Controller extends Pane {
             String hexColor = hexRed + hexGreen + hexBlue;
             int rescolor = Integer.parseInt(hexColor,16);
             setLineColor(rescolor);
-//            System.out.println(verticalLine.getBoundsInParent().toString());
-//            System.out.println(horizontalLine.getStartY() + "    -   " + horizontalLine.getEndY());
         }
 
     }
@@ -511,4 +805,11 @@ public class Controller extends Pane {
     }
 
 
+    public ZoomRequest getZoomRequest() {
+        return zoomRequest;
+    }
+
+    public void setZoomRequest(ZoomRequest zoomRequest) {
+        this.zoomRequest = zoomRequest;
+    }
 }

@@ -4,8 +4,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -19,20 +19,19 @@ public class Exam extends Application {
     public void start(Stage stage) throws Exception {
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 
-            @Override
             public void handle(WindowEvent t) {
                 Platform.exit();
                 System.exit(0);
             }
 
         });
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/test.fxml"));
+      FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/test2.fxml"));
         AnchorPane root = fxmlLoader.load();
-        Controller controller = fxmlLoader.getController();
+        ShooterController controller = fxmlLoader.getController();
         controller.initialize();
         Scene scene = new Scene(root);
         stage.setScene(scene);
-        stage.setTitle("Custom Control");
+        stage.setTitle("Aim");
         stage.show();
     }
 

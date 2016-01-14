@@ -17,10 +17,19 @@ import org.w3c.dom.*;
  */
 public class Request {
 
-    private String url="http://192.168.1.64/ISAPI/PTZCtrl/channels/1/status";
+    private String url="http://192.168.2.64/ISAPI/PTZCtrl/channels/1/status";
     private final String USER_AGENT = "Chrome/40.0.2214.111";
     private String azimuth;
     private String elevation;
+    private String zoom;
+
+    public String getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(String zoom) {
+        this.zoom = zoom;
+    }
 
     public String getElevation() {
         return elevation;
@@ -66,22 +75,27 @@ public class Request {
             Document doc = parseXML(urlConnection.getInputStream());
             NodeList elevationList = doc.getElementsByTagName("elevation");
             NodeList azimuthList = doc.getElementsByTagName("azimuth");
+            NodeList zoomList = doc.getElementsByTagName("absoluteZoom");
 
             double elev;
             double azim;
+            double zooM;
 
 
             if (elevationList.getLength() == azimuthList.getLength()) {
                 for (int i = 0; i < elevationList.getLength(); i++) {
                     elev = (Double.parseDouble(elevationList.item(i).getTextContent())) / 10;
                     azim = (Double.parseDouble(azimuthList.item(i).getTextContent())) / 10;
+                    zooM = (Double.parseDouble(zoomList.item(i).getTextContent()))/10;
                     this.azimuth = new Double(azim).toString();
                     this.elevation = new Double(elev).toString();
+                    this.zoom = new Double(zooM).toString();
                 }
             }
         } catch (Exception e){
             setAzimuth("Помилка підключення до камери");
             setElevation("Помилка підключення до камери");
+            setZoom("Помилка підключення до камери");
             e.printStackTrace();
         }
 

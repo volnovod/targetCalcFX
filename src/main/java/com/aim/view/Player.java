@@ -25,8 +25,8 @@ public class Player {
 
     private static final String PATH_TO_VIDEO = "v4l2:///dev/video0";
 //        private static final String PATH_TO_VIDEO = "rtsp://192.168.2.232//rtsp_tunnel";
-//        private static final String PATH_TO_VIDEO = "rtsp://192.168.1.201//rtsp_tunnel";
-//    private static final String PATH_TO_VIDEO = "rtsp://admin:12345@192.168.1.64//rtsp_tunnel";
+//        private static final String PATH_TO_VIDEO = "rtsp://192.168.2.2//rtsp_tunnel";
+//    private static final String PATH_TO_VIDEO = "rtsp://admin:12345@192.168.2.64//rtsp_tunnel";
 
     public Cams getCams() {
         return cams;
@@ -35,8 +35,6 @@ public class Player {
     private Cams cams;
 
     private ImageView imageView;
-
-    private DirectMediaPlayerComponent mediaPlayerComponent;
 
     private MediaPlayer mediaPlayer;
 
@@ -60,13 +58,13 @@ public class Player {
 
     public void initialize() {
 
-        if(PATH_TO_VIDEO == "v4l2:///dev/video0"){
+        if(PATH_TO_VIDEO.equals("v4l2:///dev/video0")){
             this.cams = Cams.WEBCAM;
         }
-        if(PATH_TO_VIDEO == "rtsp://admin:12345@192.168.1.64//rtsp_tunnel"){
+        if(PATH_TO_VIDEO.equals("rtsp://admin:12345@192.168.2.64//rtsp_tunnel")){
             this.cams = Cams.HICKVISION;
         }
-        if(PATH_TO_VIDEO == "rtsp://192.168.2.232//rtsp_tunnel"){
+        if(PATH_TO_VIDEO.equals("rtsp://192.168.2.232//rtsp_tunnel")){
             this.cams = Cams.BOSCH;
         }
 
@@ -88,9 +86,13 @@ public class Player {
         mediaPlayer.playMedia(PATH_TO_VIDEO, streamOption);
 
     }
+    public void stop(){
+        mediaPlayer.stop();
+    }
 
     public void getSnapshot(){
         mediaPlayer.getSnapshot();
+        mediaPlayer.nextFrame();
     }
 
     private void initializeImageView() {
@@ -132,41 +134,41 @@ public class Player {
         });
     }
 
-    private class CanvasPlayerComponent extends DirectMediaPlayerComponent {
-
-
-        public CanvasPlayerComponent() {
-            super(new CanvasBufferFormatCallback());
-
-
-        }
-
-        PixelWriter pixelWriter = null;
-
-        private PixelWriter getPW() {
-            if (pixelWriter == null) {
-                pixelWriter = writableImage.getPixelWriter();
-            }
-            return pixelWriter;
-        }
-
-        @Override
-        public void display(DirectMediaPlayer mediaPlayer, Memory[] nativeBuffers, BufferFormat bufferFormat) {
-            if (writableImage == null) {
-                return;
-            }
-
-            Platform.runLater(() -> {
-                Memory nativeBuffer = mediaPlayer.lock()[0];
-                try {
-                    ByteBuffer byteBuffer = nativeBuffer.getByteBuffer(0, nativeBuffer.size());
-                    getPW().setPixels(0, 0, bufferFormat.getWidth(), bufferFormat.getHeight(), pixelFormat, byteBuffer, bufferFormat.getPitches()[0]);
-                } finally {
-                    mediaPlayer.unlock();
-                }
-            });
-        }
-    }
+//    private class CanvasPlayerComponent extends DirectMediaPlayerComponent {
+//
+//
+//        public CanvasPlayerComponent() {
+//            super(new CanvasBufferFormatCallback());
+//
+//
+//        }
+//
+//        PixelWriter pixelWriter = null;
+//
+//        private PixelWriter getPW() {
+//            if (pixelWriter == null) {
+//                pixelWriter = writableImage.getPixelWriter();
+//            }
+//            return pixelWriter;
+//        }
+//
+//        @Override
+//        public void display(DirectMediaPlayer mediaPlayer, Memory[] nativeBuffers, BufferFormat bufferFormat) {
+//            if (writableImage == null) {
+//                return;
+//            }
+//
+//            Platform.runLater(() -> {
+//                Memory nativeBuffer = mediaPlayer.lock()[0];
+//                try {
+//                    ByteBuffer byteBuffer = nativeBuffer.getByteBuffer(0, nativeBuffer.size());
+//                    getPW().setPixels(0, 0, bufferFormat.getWidth(), bufferFormat.getHeight(), pixelFormat, byteBuffer, bufferFormat.getPitches()[0]);
+//                } finally {
+//                    mediaPlayer.unlock();
+//                }
+//            });
+//        }
+//    }
 
     private class CanvasBufferFormatCallback implements BufferFormatCallback {
         @Override

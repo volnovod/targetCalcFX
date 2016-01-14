@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
+<?import javafx.collections.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
@@ -8,7 +9,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aim.test.Controller">
+<AnchorPane fx:id="anchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aim.test.AimerController">
    <children>
       <TabPane fx:id="tabPane" layoutX="6.0" layoutY="6.0" prefHeight="768.0" prefWidth="1366.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -133,6 +134,25 @@
                                     </Label>
                                  </children>
                               </Pane>
+                              <Button fx:id="zoomadd" layoutX="1031.0" layoutY="500.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMousePressed="#startzoomadd" onMouseReleased="#stopzoomadd" prefHeight="44.0" prefWidth="44.0" text="+">
+                                 <font>
+                                    <Font name="System Bold Italic" size="15.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="zoomsub" layoutX="1031.0" layoutY="548.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMousePressed="#startzoomsub" onMouseReleased="#stopzoomsub" prefHeight="44.0" prefWidth="44.0" text="-">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Button>
+                              <ComboBox fx:id="choiseBox" layoutX="1132.0" layoutY="14.0" onAction="#changeScene" prefWidth="150.0">
+                                 <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                       <String fx:value="Стрілок" />
+                                       <String fx:value="Водій" />
+                                       <String fx:value="Наводчик" />
+                                    </FXCollections>
+                                 </items>
+                              </ComboBox>
                            </children>
                         </Pane>
                      </children>

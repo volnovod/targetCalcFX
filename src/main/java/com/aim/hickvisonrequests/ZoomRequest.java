@@ -5,42 +5,42 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by victor on 15.05.15.
- * клас, який змушує камеру HIKVISON рухатися/зупинятися
+ * Created by victor on 13.08.15.
  */
-public class ContinuousMove {
+public class ZoomRequest {
+    private int zoom;
 
     private String url = "http://192.168.2.64/ISAPI/PTZCtrl/channels/1/continuous";
     private final String USER_AGENT = "Chrome/40.0.2214.111";
-    private ZoomRequest zoom;
 
-    public ZoomRequest getZoom() {
+    public int getZoom() {
         return zoom;
     }
 
-    public void setZoom(ZoomRequest zoom) {
+    public void setZoom(int zoom) {
         this.zoom = zoom;
     }
 
     /**
-     * створення запиту для початку/закінчення поворотів
-     * @param pan - 0- зупинка руху, -100..-1 - рух вліво із різною швидкістю, 100..1 - рух вправо
-     * @param tilt - -100..-1 - рух вниз, 1..100 - рух вверх, 0 - зупинка
+     * створення запиту для курування зумом
+     * @param  zoom - -100..-1 - зум "-", 1..100 - зум "+", 0 - зупинка
      */
-    public void setRequest(int pan, int tilt, int zoom) {
+    public void setRequest(int zoom) {
+
+        setZoom(zoom);
         this.request =  "<PTZData version=\"2.0\" xmlns=\"http://www.isapi.org/ver20/XMLSchema\">\n" +
-                "<pan> " + pan + " </pan>\n" +
-                "<tilt> "+ tilt + " </tilt>\n" +
-                "<zoom> "+zoom+" </zoom>\n" +
+                "<pan> 0 </pan>\n" +
+                "<tilt> 0 </tilt>\n" +
+                "<zoom> " + zoom + " </zoom>\n" +
                 "</PTZData>";
     }
 
     private String request;
 
-    public ContinuousMove() {
+    public ZoomRequest() {
     }
 
-    public ContinuousMove(String url) {
+    public ZoomRequest(String url) {
         this.url = url;
     }
 
@@ -49,9 +49,9 @@ public class ContinuousMove {
      */
     public void start() {
         try {
-            URL urladr = new URL(this.url);
+            URL urlAdr = new URL(this.url);
 
-            HttpURLConnection urlConnection = (HttpURLConnection) urladr.openConnection();
+            HttpURLConnection urlConnection = (HttpURLConnection) urlAdr.openConnection();
 
 
             urlConnection.setRequestMethod("PUT");
@@ -68,6 +68,7 @@ public class ContinuousMove {
             outputStreamWriter.close();
 
             int responseCode = urlConnection.getResponseCode();
+
         } catch (Exception e){
             e.printStackTrace();
         }

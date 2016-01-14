@@ -22,96 +22,91 @@ import static jcuda.driver.JCudaDriver.*;
 public class MedianGPU {
 
     public static void main(String[] args) {
+        for (int asd=0; asd<19;asd++ ){
+            for (int a =0; a< 10; a++){
+                File file = new File("/home/victor/Java/workFX/img/step/tester/"+asd+"/tester"+a+".png");
+                BufferedImage bufferedImage = new BufferedImage(640,480, BufferedImage.TYPE_BYTE_GRAY);
+                try {
 
-//        long[] in_array ={1,22,3,4,5,63,7,38,9,10,1,23,3,43,5,63,7,8,9,10,1,2,33,4,5,63,7,8,9,310,1,2,3,43,5,6,7,8,9,10,
-//                13,42,3,4,5,6,7,8,9,1010,1,23,3,4,53,6,744,8,94,10};
-//        int threads = 6;
-//        int size = 10;
+                    bufferedImage = ImageIO.read(new FileInputStream(file));
 
-        File file = new File("/home/victor/Java/workFX/auto.png");
-        BufferedImage bufferedImage = null;
-        try {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-            bufferedImage = ImageIO.read(new FileInputStream(file));
 
-        } catch (IOException e) {
-            e.printStackTrace();
+                int threads = bufferedImage.getHeight();
+                int size = bufferedImage.getWidth();
+
+
+                cuInit(0);
+                CUdevice device = new CUdevice();
+                cuDeviceGet(device, 0);
+                CUcontext pctx = new CUcontext();
+                cuCtxCreate(pctx, 0, device);
+
+                CUmodule module = new CUmodule();
+                cuModuleLoad(module, "src/main/java/com/aim/comvision/optimizkernel.ptx");
+                CUfunction function = new CUfunction();
+                cuModuleGetFunction(function, module, "filter");
+
+                CUdeviceptr input = new CUdeviceptr();
+                CUdeviceptr out = new CUdeviceptr();
+
+                cuMemAlloc(input, size * threads* Sizeof.INT);
+
+
+                cuMemAlloc(out, size * threads* Sizeof.INT);
+
+                int blockSizeX = 16;
+                int blockSizeY = 16;
+                int gridSizeX = (int) Math.ceil((double) size / blockSizeX);
+                int gridSizeY = (int) Math.ceil((double) threads / blockSizeY);
+
+
+                int[] o_array = new int[threads * size];
+
+
+                WritableRaster raster = bufferedImage.getRaster();
+                int[] int_array = new int[640*480];
+                raster.getPixels(0,0,640,480,int_array);
+                cuMemcpyHtoD(input, Pointer.to(int_array), size * threads * Sizeof.INT);
+                Pointer kernelParam = Pointer.to(Pointer.to(input),
+                        Pointer.to(out),
+                        Pointer.to(new int[]{size}),
+                        Pointer.to(new int[]{threads}));
+                cuLaunchKernel(function,
+                        gridSizeX, gridSizeY, 1,      // Grid dimension
+                        blockSizeX, blockSizeY, 1,      // Block dimension
+                        0, null,               // Shared memory size and stream
+                        kernelParam, null // Kernel- and extra parameters
+                );
+                cuMemcpyDtoH(Pointer.to(o_array), out, size * threads * Sizeof.INT);
+                cuMemFree(input);
+                cuMemFree(out);
+
+                BufferedImage out1 = new BufferedImage(640,480, BufferedImage.TYPE_BYTE_GRAY);
+                WritableRaster raster1 = out1.getRaster();
+                int count=0;
+                for (int i=0; i<480;i++){
+                    for (int j=0;j<640;j++){
+                        raster1.setSample(j,i,0,o_array[count]);
+                        count++;
+                    }
+                }
+
+
+                File image1 = new File("img/step/median/"+asd+"/mfilter"+a+".png");
+                try {
+                    ImageIO.write(out1, "png", image1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
 
-        int threads = bufferedImage.getHeight();
-        int size = bufferedImage.getWidth();
 
-        int[] int_array = bufferedImage.getRGB(0,0,size, threads, null, 0, size);
-
-        long[] in_array = new long[int_array.length];
-        for (int i = 0; i<int_array.length; i++){
-            in_array[i] = int_array[i];
-        }
-        cuInit(0);
-        CUdevice device = new CUdevice();
-        cuDeviceGet(device, 0);
-        CUcontext pctx = new CUcontext();
-        cuCtxCreate(pctx, 0, device);
-
-        CUmodule module = new CUmodule();
-        cuModuleLoad(module, "/home/victor/Java/workFX/src/main/java/com/aim/comvision/mediankernel.ptx");
-        CUfunction function = new CUfunction();
-        cuModuleGetFunction(function, module, "filter");
-
-        long start = new Date().getTime();
-        CUdeviceptr input = new CUdeviceptr();
-        cuMemAlloc(input, size * threads * Sizeof.LONG);
-
-        cuMemcpyHtoD(input, Pointer.to(in_array), size * threads * Sizeof.LONG);
-
-        CUdeviceptr out = new CUdeviceptr();
-
-        cuMemAlloc(out, size * threads * Sizeof.LONG);
-
-        Pointer kernelParam = Pointer.to(Pointer.to(input),
-                Pointer.to(out),
-                Pointer.to(new int[]{threads}),
-                Pointer.to(new int[]{size}));
-        int numElements = threads * size;
-
-        int blockSizeX = 16;
-        int blockSizeY = 16;
-        int gridSizeX = (int)Math.ceil((double)size / blockSizeX);
-        int gridSizeY = (int)Math.ceil((double)threads/ blockSizeY );
-        cuLaunchKernel(function,
-                gridSizeX, gridSizeY, 1,      // Grid dimension
-                blockSizeX, blockSizeY, 1,      // Block dimension
-                0, null,               // Shared memory size and stream
-                kernelParam, null // Kernel- and extra parameters
-        );
-        long[] o_array = new long[size * threads];
-        cuMemcpyDtoH(Pointer.to(o_array), out, size * threads * Sizeof.LONG);
-        System.out.println("time " + (new Date().getTime()-start)/1000.0  + "s");
-
-        cuMemFree(input);
-        cuMemFree(out);
-        int count1=0;
-
-
-        DirectColorModel cm = (DirectColorModel) ColorModel.getRGBdefault();
-
-        int[] buf_arr = new int[o_array.length];
-        for (int i = 0; i < o_array.length; i++){
-            buf_arr[i] = (int)o_array[i];
-        }
-
-        DataBufferInt buffer = new DataBufferInt(buf_arr, size*threads);
-        WritableRaster raster = Raster.createPackedRaster(buffer, size, threads,size, cm.getMasks(), null);
-        BufferedImage out1 =  new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
-
-
-        File image1 = new File("gpu.png");
-        try {
-            ImageIO.write(out1, "png", image1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
 
     }

@@ -9,7 +9,7 @@ import java.net.URL;
  */
 public class HomePositionRequest {
 
-    private String url = "http://192.168.1.64/ISAPI/PTZCtrl/channels/1/homeposition/goto";
+    private String url = "http://192.168.2.64/ISAPI/PTZCtrl/channels/1/homeposition/goto";
     private final String USER_AGENT = "Chrome/40.0.2214.111";
 
 
